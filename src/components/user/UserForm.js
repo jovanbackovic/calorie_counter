@@ -1,0 +1,153 @@
+import React, { Component } from "react";
+import { Field, reduxForm } from "redux-form";
+import { Checkbox } from "semantic-ui-react";
+import _ from "lodash";
+
+import {} from "../../utils/validationRules";
+import { isAdmin, isManagerOrAdmin } from "../../utils/rolesUtility";
+import {
+  validatePasswordAndConfirmedPassword,
+  validateCaloriesPerDay,
+  validateUserRoles,
+  validateUsername
+} from "../../utils/validationRules";
+
+class UserForm extends Component {
+  renderInput = ({ input, label, meta, type, edit = false }) => {
+    const className = `field ${meta.error && meta.touched ? "error" : ""}`;
+    return (
+      <div className={className}>
+        <label>{label}</label>
+        <input type={type} {...input} autoComplete="off" disabled={edit} />
+        {this.renderError(meta)}
+      </div>
+    );
+  };
+
+  renderError({ error, touched }) {
+    if (error && touched) {
+      return <div className="ui error message">{error}</div>;
+    }
+    return null;
+  }
+
+  renderRoles = roles => {
+    const adminCheckbox = isAdmin(roles) ? (
+      <Field name="admin" label="Admin" component={this.renderCheckboxField} />
+    ) : null;
+
+    if (isManagerOrAdmin(roles)) {
+      return (
+        <div className="field">
+          <label>Roles</label>
+          <div className="inline  fields">
+            <Field
+              name="regularUser"
+              label="Regular User"
+              component={this.renderCheckboxField}
+            />
+            <Field
+              name="menager"
+              label="Menager"
+              component={this.renderCheckboxField}
+            />
+            {adminCheckbox}
+          </div>
+          <Field
+            name="roles"
+            component={({ meta }) => <div>{this.renderError(meta)}</div>}
+          />
+        </div>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  renderCheckboxField = ({ input, label }) => {
+    input = _.omit(input, "value");
+    return (
+      <div className="field">
+        <Checkbox label={label} {...input} />
+      </div>
+    );
+  };
+
+  render() {
+    const { roles, edit, buttonText } = this.props;
+    return (
+      <div className="eight wide column">
+        <form
+          className="ui form error"
+          onSubmit={this.props.handleSubmit(this.props.onSubmit)}
+        >
+          <Field
+            name="username"
+            label="Username"
+            type="text"
+            component={this.renderInput}
+            edit={edit}
+          />
+
+          <Field
+            name="password"
+            label="Password"
+            type="password"
+            component={this.renderInput}
+          />
+          <Field
+            name="confirmedPassword"
+            label="Confirm Password"
+            type="password"
+            component={this.renderInput}
+          />
+          <Field
+            name="firstName"
+            label="First Name"
+            type="text"
+            component={this.renderInput}
+          />
+          <Field
+            name="lastName"
+            label="Last Name"
+            type="text"
+            component={this.renderInput}
+          />
+          <Field
+            name="caloriesPerDay"
+            label="Calories Per Day"
+            type="number"
+            component={this.renderInput}
+          />
+          {this.renderRoles(roles)}
+          <div className="ui centered grid">
+            <div className="centered row">
+              <button className="ui primary button large">{buttonText}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    );
+  }
+}
+
+const validate = (values, props) => {
+  const { roles, edit } = props;
+  var errors = {};
+  if (isManagerOrAdmin(roles)) {
+    errors = { ...errors, ...validateUserRoles(values) };
+  }
+  if (!edit) {
+    errors = { ...errors, ...validateUsername(values) };
+  }
+  if (!edit || values.password) {
+    errors = { ...errors, ...validatePasswordAndConfirmedPassword(values) };
+  }
+  errors = { ...errors, ...validateCaloriesPerDay(values) };
+  return errors;
+};
+
+export default reduxForm({
+  form: "userForm",
+  validate
+})(UserForm);
