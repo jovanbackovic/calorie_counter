@@ -21,7 +21,7 @@ export const logInPayload = (user, roles) => {
 
 export const logIn = logInData => async dispatch => {
   try {
-    const res = await api.post("/api/login", logInData);
+    const res = await api.post("/log_in", logInData);
     const { token, roles } = res.data;
     const user = jwt_decode(token);
     setLocalAuth(token, roles);
@@ -32,17 +32,17 @@ export const logIn = logInData => async dispatch => {
   }
 };
 
-export const logOut = dispatch => {
+export const logOut = () => dispatch => {
   removeLocalAuth();
-  history.push("/");
   dispatch({
     type: LOG_OUT
   });
+  history.push("/");
 };
 
 export const register = async user => {
   try {
-    await api.post("/api/register", user);
+    await api.post("/register", user);
     history.push("/");
   } catch (error) {
     usernameAlreadyExist(error);

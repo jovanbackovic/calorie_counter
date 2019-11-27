@@ -14,11 +14,9 @@ class Register extends Component {
 
   render() {
     return (
-      <div className="ui centered grid">
-        <div className="row">
-          <h3>Registration Form</h3>
-        </div>
+      <div>
         <UserForm
+          title="Registration Form"
           buttonText="Register"
           edit={false}
           roles={[]}

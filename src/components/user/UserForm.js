@@ -3,9 +3,10 @@ import { Field, reduxForm } from "redux-form";
 import { Checkbox } from "semantic-ui-react";
 import _ from "lodash";
 
-import {} from "../../utils/validationRules";
 import { isAdmin, isManagerOrAdmin } from "../../utils/rolesUtility";
 import {
+  validateFirstName,
+  validateLastName,
   validatePasswordAndConfirmedPassword,
   validateCaloriesPerDay,
   validateUserRoles,
@@ -40,15 +41,15 @@ class UserForm extends Component {
       return (
         <div className="field">
           <label>Roles</label>
-          <div className="inline  fields">
+          <div className="inline fields">
             <Field
               name="regularUser"
               label="Regular User"
               component={this.renderCheckboxField}
             />
             <Field
-              name="menager"
-              label="Menager"
+              name="manager"
+              label="Manager"
               component={this.renderCheckboxField}
             />
             {adminCheckbox}
@@ -65,67 +66,81 @@ class UserForm extends Component {
   };
 
   renderCheckboxField = ({ input, label }) => {
+    if (this.props.edit && input.value === "") return null;
+    const checked = this.props.edit && input.value;
     input = _.omit(input, "value");
     return (
       <div className="field">
-        <Checkbox label={label} {...input} />
+        <Checkbox label={label} {...input} defaultChecked={checked} />
       </div>
     );
   };
 
   render() {
-    const { roles, edit, buttonText } = this.props;
+    const { roles, edit, buttonText, title } = this.props;
     return (
-      <div className="eight wide column">
-        <form
-          className="ui form error"
-          onSubmit={this.props.handleSubmit(this.props.onSubmit)}
-        >
-          <Field
-            name="username"
-            label="Username"
-            type="text"
-            component={this.renderInput}
-            edit={edit}
-          />
+      <div className="ui two column center aligned grid">
+        <div className="column">
+          <div style={{ marginTop: "60px" }} className="ui segment">
+            <h3>{title}</h3>
+            <br />
+            <div className="ui left aligned grid">
+              <div className="left floated column">
+                <form
+                  className="ui form error"
+                  onSubmit={this.props.handleSubmit(this.props.onSubmit)}
+                >
+                  <Field
+                    name="username"
+                    label="Username"
+                    type="text"
+                    component={this.renderInput}
+                    edit={edit}
+                  />
 
-          <Field
-            name="password"
-            label="Password"
-            type="password"
-            component={this.renderInput}
-          />
-          <Field
-            name="confirmedPassword"
-            label="Confirm Password"
-            type="password"
-            component={this.renderInput}
-          />
-          <Field
-            name="firstName"
-            label="First Name"
-            type="text"
-            component={this.renderInput}
-          />
-          <Field
-            name="lastName"
-            label="Last Name"
-            type="text"
-            component={this.renderInput}
-          />
-          <Field
-            name="caloriesPerDay"
-            label="Calories Per Day"
-            type="number"
-            component={this.renderInput}
-          />
-          {this.renderRoles(roles)}
-          <div className="ui centered grid">
-            <div className="centered row">
-              <button className="ui primary button large">{buttonText}</button>
+                  <Field
+                    name="password"
+                    label="Password"
+                    type="password"
+                    component={this.renderInput}
+                  />
+                  <Field
+                    name="confirmedPassword"
+                    label="Confirm Password"
+                    type="password"
+                    component={this.renderInput}
+                  />
+                  <Field
+                    name="firstName"
+                    label="First Name"
+                    type="text"
+                    component={this.renderInput}
+                  />
+                  <Field
+                    name="lastName"
+                    label="Last Name"
+                    type="text"
+                    component={this.renderInput}
+                  />
+                  <Field
+                    name="caloriesPerDay"
+                    label="Calories Per Day"
+                    type="number"
+                    component={this.renderInput}
+                  />
+                  {this.renderRoles(roles)}
+                  <div className="ui centered grid">
+                    <div className="centered row">
+                      <button className="ui primary button large">
+                        {buttonText}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     );
   }
@@ -144,10 +159,13 @@ const validate = (values, props) => {
     errors = { ...errors, ...validatePasswordAndConfirmedPassword(values) };
   }
   errors = { ...errors, ...validateCaloriesPerDay(values) };
+  errors = { ...errors, ...validateFirstName(values) };
+  errors = { ...errors, ...validateLastName(values) };
   return errors;
 };
 
 export default reduxForm({
   form: "userForm",
-  validate
+  validate,
+  enableReinitialize: false
 })(UserForm);

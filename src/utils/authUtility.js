@@ -24,7 +24,7 @@ export const sessionExists = dispatch => {
   if (token) {
     const decodedToken = jwt_decode(token);
     if (tokenExpired(decodedToken)) {
-      logOut(dispatch);
+      dispatch(logOut());
       return false;
     }
     const roles = localStorage.getItem("roles").split(",");

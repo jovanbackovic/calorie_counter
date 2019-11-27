@@ -37,34 +37,41 @@ class LogIn extends Component {
 
   render() {
     return (
-      <div className="ui centered grid">
-        <div className="row">
-          <h3>Log In</h3>
-        </div>
-        <div className="eight wide column">
-          <form
-            className="ui form error"
-            onSubmit={this.props.handleSubmit(this.onSubmit)}
-          >
-            <Field
-              name="username"
-              label="Username"
-              type="text"
-              component={this.renderInput}
-            />
+      <div className="ui two column center aligned grid">
+        <div className="column">
+          <div style={{ marginTop: "60px" }} className="ui segment">
+            <h3>Log In</h3>
+            <br />
+            <div className="ui left aligned grid">
+              <div className="left floated column">
+                <form
+                  className="ui form error"
+                  onSubmit={this.props.handleSubmit(this.onSubmit)}
+                >
+                  <Field
+                    name="username"
+                    label="Username"
+                    type="text"
+                    component={this.renderInput}
+                  />
 
-            <Field
-              name="password"
-              label="Password"
-              type="password"
-              component={this.renderInput}
-            />
-            <div className="ui centered grid">
-              <div className="centered row">
-                <button className="ui primary button large">Log In</button>
+                  <Field
+                    name="password"
+                    label="Password"
+                    type="password"
+                    component={this.renderInput}
+                  />
+                  <div className="ui centered grid">
+                    <div className="centered row">
+                      <button className="ui primary button large">
+                        Log In
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     );
